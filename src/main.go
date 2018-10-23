@@ -79,8 +79,9 @@ func (cb *callbacks) Report() {
 	defer cb.mu.Unlock()
 	log.WithFields(log.Fields{"fetches": cb.fetches, "requests": cb.requests}).Info("cb.Report()  callbacks")
 }
-func (cb *callbacks) OnStreamOpen(id int64, typ string) {
+func (cb *callbacks) OnStreamOpen(context context.Context, id int64, typ string) error {
 	log.Infof("OnStreamOpen %d open for %s", id, typ)
+	return nil
 }
 func (cb *callbacks) OnStreamClosed(id int64) {
 	log.Infof("OnStreamClosed %d closed", id)
@@ -99,7 +100,7 @@ func (cb *callbacks) OnStreamResponse(int64, *v2.DiscoveryRequest, *v2.Discovery
 	log.Infof("OnStreamResponse...")
 	cb.Report()
 }
-func (cb *callbacks) OnFetchRequest(req *v2.DiscoveryRequest) {
+func (cb *callbacks) OnFetchRequest(context context.Context, req *v2.DiscoveryRequest) error {
 	log.Infof("OnFetchRequest...")
 	cb.mu.Lock()
 	defer cb.mu.Unlock()
@@ -108,6 +109,7 @@ func (cb *callbacks) OnFetchRequest(req *v2.DiscoveryRequest) {
 		close(cb.signal)
 		cb.signal = nil
 	}
+	return nil
 }
 func (cb *callbacks) OnFetchResponse(*v2.DiscoveryRequest, *v2.DiscoveryResponse) {}
 
